@@ -1,6 +1,0 @@
-datalogy < 1.0.0
-nose < 2.0.0
-pyquery < 2.0.0
-requests < 2.1.0
-scraperwiki < 1.0.0
-tablib < 1.0.0
