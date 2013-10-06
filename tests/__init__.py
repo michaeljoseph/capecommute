@@ -4,6 +4,8 @@ from capecommute import train
 
 class TrainTestCase(TestCase):
 
+    row = [1, 2, 3]
+
     def test_parse_url(self):
         url = '_timetables/2013_04_08/South/ST_CT_Sun_April_2013.htm'
         self.assertEquals(
@@ -19,16 +21,27 @@ class TrainTestCase(TestCase):
         )
 
     def test_pad_list(self):
-        row = [1, 2, 3]
         self.assertEquals(
-            row + [None],
-            train.pad_list(row, 4)
+            self.row + [None],
+            train.pad_list(self.row, 4)
         )
 
     def test_pad_list_right_size(self):
-        row = [1, 2, 3]
         self.assertEquals(
-            row,
-            train.pad_list(row, 3)
+            self.row,
+            train.pad_list(self.row, 3)
         )
 
+    def test_non_empty(self):
+        self.assertTrue(train.non_empty(self.row))
+        self.assertFalse(train.non_empty(['', None]))
+
+
+    def test_extract_stations(self):
+        pass
+
+    def test_extract_train_numbers(self):
+        pass
+
+    def test_generate_dataset(self):
+        pass
