@@ -19,6 +19,8 @@ def parse_url(url):
     return zone, start_station, end_station, period
 
 
+# TODO: move to datalogy
+# scrape(html, expression)
 def parse_html(html):
     html_table = []
     document = pq(html)
@@ -30,6 +32,7 @@ def parse_html(html):
     return html_table
 
 
+# TODO: move to datalogy
 def pad_list(row, length):
     padding = length - len(row)
     if padding:
@@ -38,6 +41,7 @@ def pad_list(row, length):
     return row
 
 
+# TODO: move to datalogy
 def non_empty(row):
     return any([cell for cell in row])
 
