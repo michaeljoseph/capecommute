@@ -7,6 +7,8 @@ import requests
 import tablib
 import scraperwiki
 
+from capecommute import config
+
 log = logging.getLogger(__name__)
 
 
@@ -15,10 +17,6 @@ def parse_url(url):
     date, zone, title = path_components[-3:]
     (start_station, end_station, period) = title.split('_')[:3]
     return zone, start_station, end_station, period
-
-
-def store_timetable(keys, data, table_name):
-    return scraperwiki.sql.save(keys, data, table_name=table_name)
 
 
 def parse_html(html):
@@ -33,36 +31,38 @@ def parse_html(html):
 
 
 def pad_list(row, length):
-    if len(row) < length:
-        return row + [length-len(row) * None]
+    padding = length - len(row)
+    if padding:
+        padding = padding * [None]
+        return row + padding
+    return row
 
 
-def generate_dataset():
+def non_empty(row):
+    return any([cell for cell in row])
+
+
+def extract_station(row):
+    """The first column has the station name"""
+    return row[0]
+
+
+def generate_dataset(parsed_html):
     data = tablib.Dataset()
-    data.headers = ('name', 'age')
+    headers = []
+    while not headers:
+        # first (non-empty) row is the train numbers
+        header_row = parsed_html.pop()
+        if non_empty(header_row):
+            headers = header_row
+    data.headers = headers
+
+    stations = []
+    # TODO: write a function for each transformation
+    # - 
+    for row_data in parsed_html:
+        stations.append(extract_station(row_data))
+        data.append(pad_list(row_data, data.width))
+
     return data
 
-
-def serve_output_type(datatable, output_type):
-    # output_types = ['csv', 'json']
-#        with open('%s.%s' % (file_mask, output_type), 'w') as filename:
-    return datatable.output_type()
-
-
-def main():
-    cape_metro = 'http://www.capemetrorail.co.za/_timetables'
-    url = '%s/2013_04_08/South/ST_CT_Sun_April_2013.htm' % cape_metro
-
-    print(parse_url(url))
-
-    zone, start_station, end_station, period = parse_url(url)
-    file_mask = '%s-%s-%s' % (zone, start_station, end_station)
-
-    content = requests.get(url).content
-    table = parse_html(content)
-    print('Parsed %s rows' % len(table))
-    #store_timetable(table.json.keys(), table, 'capemetro_%s_train_schedule'))
-
-if __name__ == '__main__':
-    logging.basicConfig(level='DEBUG')
-    main()
