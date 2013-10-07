@@ -21,9 +21,7 @@ def parse_url(url):
     )
 
 
-# TODO: move to datalogy
-# scrape(html, expression)
-def parse_html(html):
+def parse_html_table(html):
     html_table = []
     document = pq(html)
     for row in document('table > tr'):

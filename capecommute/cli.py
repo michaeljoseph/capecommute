@@ -4,7 +4,7 @@ import requests
 import scraperwiki
 
 from capecommute import config
-from capecommute.train import parse_url, parse_html, generate_dataset
+from capecommute.train import parse_url, parse_html_table, generate_dataset
 
 log = logging.getLogger(__name__)
 
@@ -24,14 +24,14 @@ def main():
     file_mask = '%s-%s-%s' % (zone, start_station, end_station)
 
     content = requests.get(url).content
-    parsed_table = parse_html(content)
+    parsed_table = parse_html_table(content)
     log.info('Parsed %s rows', len(parsed_table))
 
     dataset = generate_dataset(parsed_table)
-    log.info('Generated dataset %s', dataset)
+    log.info('Generated dataset %s', dataset.dict)
 
     result = scraperwiki.sql.save(
-        dataset.json.keys,
+        dataset.headers,
         dataset,
         'capemetro_%s_train_schedule' % file_mask
     )

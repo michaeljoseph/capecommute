@@ -19,7 +19,7 @@ class TrainTestCase(TestCase):
     def test_parse_html(self):
         html = '<html></html>'
         self.assertTrue(
-            isinstance(train.parse_html(html), list)
+            isinstance(train.parse_html_table(html), list)
         )
 
     def test_pad_list(self):
