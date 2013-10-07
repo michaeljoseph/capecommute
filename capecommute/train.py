@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from datetime import datetime
 
 import logging
 
@@ -12,7 +13,13 @@ def parse_url(url):
     path_components = url.split('/')
     date, zone, title = path_components[-3:]
     (start_station, end_station, period) = title.split('_')[:3]
-    return zone, start_station, end_station, period
+
+    return (
+        zone,
+        start_station, end_station,
+        period,
+        datetime.strptime(date, '%Y_%m_%d')
+    )
 
 
 # TODO: move to datalogy

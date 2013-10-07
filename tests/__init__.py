@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from unittest2 import TestCase
 
 from capecommute import train
@@ -10,7 +12,7 @@ class TrainTestCase(TestCase):
     def test_parse_url(self):
         url = '_timetables/2013_04_08/South/ST_CT_Sun_April_2013.htm'
         self.assertEquals(
-            ('South', 'ST', 'CT', 'Sun'),
+            ('South', 'ST', 'CT', 'Sun', datetime(2013, 4, 8, 0, 0)),
             train.parse_url(url)
         )
 
