@@ -49,6 +49,13 @@ def non_empty(row):
     return any([cell for cell in row])
 
 
+def normalise_tabular_labelling(row, marker_item):
+    for item in row:
+        if item == marker_item:
+            row.remove(item)
+    return row
+
+
 def extract_station(row):
     """The first column has the station name"""
     return row[0]

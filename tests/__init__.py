@@ -40,6 +40,12 @@ class TrainTestCase(TestCase):
 
     def test_extract_stations(self):
         pass
+    def test_normalise_tabular_labelling(self):
+        self.assertEquals(
+            ['0116', '0118', '0120', '0124'],
+            train.normalise_tabular_labelling(self.labelled_row, 'TRAIN NO.')
+        )
+
 
     def test_extract_train_numbers(self):
         pass
