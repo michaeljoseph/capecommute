@@ -3,11 +3,7 @@
 import logging
 
 from pyquery import PyQuery as pq
-import requests
 import tablib
-import scraperwiki
-
-from capecommute import config
 
 log = logging.getLogger(__name__)
 
@@ -63,10 +59,8 @@ def generate_dataset(parsed_html):
 
     stations = []
     # TODO: write a function for each transformation
-    # - 
     for row_data in parsed_html:
         stations.append(extract_station(row_data))
         data.append(pad_list(row_data, data.width))
 
     return data
-

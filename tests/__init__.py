@@ -2,6 +2,7 @@ from unittest2 import TestCase
 
 from capecommute import train
 
+
 class TrainTestCase(TestCase):
 
     row = [1, 2, 3]
@@ -15,7 +16,6 @@ class TrainTestCase(TestCase):
 
     def test_parse_html(self):
         html = '<html></html>'
-        expected = []
         self.assertTrue(
             isinstance(train.parse_html(html), list)
         )
@@ -35,7 +35,6 @@ class TrainTestCase(TestCase):
     def test_non_empty(self):
         self.assertTrue(train.non_empty(self.row))
         self.assertFalse(train.non_empty(['', None]))
-
 
     def test_extract_stations(self):
         pass

@@ -15,9 +15,10 @@ def main():
     url = '%s/2013_04_08/South/ST_CT_Sun_April_2013.htm' % cape_metro
 
     zone, start_station, end_station, period = parse_url(url)
-    log.info('Parsing timetable for '
-             'zone=%s start_station=%s, end_station=%s, period=%s',
-             zone, start_station, end_station, period
+    log.info(
+        'Parsing timetable for '
+        'zone=%s start_station=%s, end_station=%s, period=%s',
+        zone, start_station, end_station, period
     )
 
     file_mask = '%s-%s-%s' % (zone, start_station, end_station)
@@ -30,9 +31,8 @@ def main():
     log.info('Generated dataset %s', dataset)
 
     result = scraperwiki.sql.save(
-        table.json.keys,
-        table,
-        'capemetro_%s_train_schedule' % file_mast
+        dataset.json.keys,
+        dataset,
+        'capemetro_%s_train_schedule' % file_mask
     )
     log.info('scraperwiki.sql save result: %s', result)
-
