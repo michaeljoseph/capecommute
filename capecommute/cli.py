@@ -14,11 +14,11 @@ def main():
     cape_metro = config.CAPEMETRO_URL
     url = '%s/2013_04_08/South/ST_CT_Sun_April_2013.htm' % cape_metro
 
-    zone, start_station, end_station, period = parse_url(url)
+    zone, start_station, end_station, period, timetable_date = parse_url(url)
     log.info(
         'Parsing timetable for '
-        'zone=%s start_station=%s, end_station=%s, period=%s',
-        zone, start_station, end_station, period
+        'zone=%s start_station=%s, end_station=%s, period=%s, date=%s',
+        zone, start_station, end_station, period, timetable_date
     )
 
     file_mask = '%s-%s-%s' % (zone, start_station, end_station)
