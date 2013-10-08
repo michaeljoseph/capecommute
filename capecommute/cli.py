@@ -9,6 +9,7 @@ from capecommute import train
 log = logging.getLogger(__name__)
 
 
+# TODO: cache html files etag
 def main():
     logging.basicConfig(level='DEBUG')
 
@@ -20,17 +21,18 @@ def main():
             zone, start_station, end_station, period, timetable_date
         )
 
-        table_name = 'capemetro_%s-%s-%s_train_schedule' % (zone, start_station, end_station)
+        table_name = (
+            'capemetro_%s-%s-%s_train_schedule' %
+            (zone, start_station, end_station)
+        ).lower()
 
         content = requests.get(url).content
-        parsed_table = html.parse_html_table(content)
-        log.info('Parsed %s rows', len(parsed_table))
+        parsed_html_table = html.parse_html_table(content)[::-1]
+        log.info('Parsed %s rows', len(parsed_html_table))
 
-        dataset = train.generate_dataset(parsed_table)
-        log.debug('Generated dataset %s', dataset.dict)
+        platforms, trains, station_times, parsed_timetable = train.parse_timetable(parsed_html_table)
 
-        import pprint
-        pprint.pprint(dataset.dict)
+        dataset = train.generate_dataset(parsed_timetable, platforms)
         log.debug('Saving data=%s, table=%s',
                   dataset.dict,
                   table_name)

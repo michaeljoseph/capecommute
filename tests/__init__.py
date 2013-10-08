@@ -1,13 +1,12 @@
 from datetime import datetime
 
+from tablib import Dataset
 from unittest2 import TestCase
 
-from capecommute import train
+from capecommute import train, config
 
 
 class TrainTestCase(TestCase):
-
-    row = [1, 2, 3]
 
     def test_parse_url(self):
         url = '_timetables/2013_04_08/South/ST_CT_Sun_April_2013.htm'
@@ -16,39 +15,45 @@ class TrainTestCase(TestCase):
             train.parse_url(url)
         )
 
-    def test_parse_html(self):
-        html = '<html></html>'
-        self.assertTrue(
-            isinstance(train.parse_html_table(html), list)
-        )
-
-    def test_pad_list(self):
+    def test_scrape_capemetro_urls(self):
         self.assertEquals(
-            self.row + [None],
-            train.pad_list(self.row, 4)
+            [#'%s/2013_04_08/South/ST_CT_Sun_April_2013.htm' % config.CAPEMETRO_URL,
+             '%s/2013_09_06/South/CT_ST_MonFri_September_2013.htm' % config.CAPEMETRO_URL],
+            train.scrape_capemetro_urls()
         )
 
-    def test_pad_list_right_size(self):
+    def test_extract_station(self):
+        row = ['SIMON`S TOWN', '04:24', '05:24', '06:22', '07:18', '08:17',
+               '09:04', '09:55', '10:42', '11:53', 'SIMON`S TOWN', '13:00',
+               '13:41', '14:54', '16:02']
+        expected = list(set(row))
+        expected.remove('SIMON`S TOWN')
         self.assertEquals(
-            self.row,
-            train.pad_list(self.row, 3)
+            ('SIMON`S TOWN', sorted(expected)),
+            train.extract_station(row)
         )
 
-    def test_non_empty(self):
-        self.assertTrue(train.non_empty(self.row))
-        self.assertFalse(train.non_empty(['', None]))
+    # def test_append_to_dataset(self):
+    #     original_data = Dataset()
+    #     original_data.headers = ['first', 'second', 'third']
 
-    def test_extract_stations(self):
-        pass
-    def test_normalise_tabular_labelling(self):
-        self.assertEquals(
-            ['0116', '0118', '0120', '0124'],
-            train.normalise_tabular_labelling(self.labelled_row, 'TRAIN NO.')
-        )
+    #     row = [1, 2, 3]
 
+    #     self.assertEquals(
+    #         [dict(zip(original_data.headers, row))],
+    #         train.append_to_dataset(original_data, row).dict
+    #     )
 
-    def test_extract_train_numbers(self):
-        pass
+    # def test_append_to_dataset_more_columns(self):
+    #     original_data = Dataset()
+    #     original_data.headers = ['first', 'second', 'third']
+
+    #     row = [1, 2, 3, 4]
+
+    #     self.assertEquals(
+    #         [dict(zip(original_data.headers, row))],
+    #         train.append_to_dataset(original_data, row).dict
+    #     )
 
     def test_generate_dataset(self):
         pass
