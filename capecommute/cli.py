@@ -1,10 +1,10 @@
 import logging
 
+from datalogy import html
 import requests
 import scraperwiki
 
-from capecommute import config
-from capecommute.train import parse_url, parse_html_table, generate_dataset
+from capecommute import train
 
 log = logging.getLogger(__name__)
 
