@@ -1,6 +1,6 @@
 import logging
 
-from datalogy import html
+from datalogy.html import parse_html_table
 import requests
 import scraperwiki
 
@@ -10,32 +10,28 @@ log = logging.getLogger(__name__)
 
 
 # TODO: cache html files etag
-def main():
-    logging.basicConfig(level='DEBUG')
+def main(debug=False):
+    #
+    logging.basicConfig(level='DEBUG' if debug else 'INFO')
 
     for url in train.scrape_capemetro_urls():
-        zone, start_station, end_station, period, timetable_date = train.parse_url(url)
-        log.info(
-            'Parsing timetable for '
-            'zone=%s start_station=%s, end_station=%s, period=%s, date=%s',
-            zone, start_station, end_station, period, timetable_date
-        )
+        try:
+            zone, start_station, end_station, period, platforms, trains, station_times, parsed_timetable = (
+                train.parse_timetable(url)
+            )
 
-        table_name = (
-            'capemetro_%s-%s-%s_train_schedule' %
-            (zone, start_station, end_station)
-        ).lower()
+            # dataset = train.generate_datasets(station_times, trains)
 
-        content = requests.get(url).content
-        parsed_html_table = html.parse_html_table(content)[::-1]
-        log.info('Parsed %s rows', len(parsed_html_table))
+            table_name = (
+                'capemetro_%s-%s-%s_train_schedule' %
+                (zone, start_station, end_station)
+            ).lower().replace('-', '_')
 
-        platforms, trains, station_times, parsed_timetable = train.parse_timetable(parsed_html_table)
+            log.debug('Saving table=%s', table_name)
+            from pprint import pprint
+            pprint(station_times, indent=4)
 
-        dataset = train.generate_dataset(parsed_timetable, platforms)
-        log.debug('Saving data=%s, table=%s',
-                  dataset.dict,
-                  table_name)
-
-        result = scraperwiki.sql.save([], dataset.dict)
-        log.info('scraperwiki.sql save result: %s', result)
+            # result = scraperwiki.sql.save([], dataset.dict, table_name=table_name)
+            # log.info('scraperwiki.sql save result: %s', result)
+        except:
+            log.exception('%s bombed, continuing', url)
