@@ -49,49 +49,114 @@ def resized_row(row, length):
     row_needs_padding = length < len(row)
     new_column_length = max(len(row), length)
 
-    log.debug('resized_row row=%s', row)
     if row_needs_padding:
         return new_column_length, pad_list(row, length)
 
     return new_column_length, row
 
 
-def generate_dataset(table, headers):
-    data = tablib.Dataset()
-    data.headers = headers
+def generate_datasets(station_times, headers):
+    datasets = []
+
+    for station, data in station_times.items():
+        dataset = tablib.Dataset()
+        dataset.headers = headers
+        print(data)
+        for time, time_data in data['times']:
+            print(time)
+            print(time_data)
+            dataset.append({
+                'start_station': data['start_station'],
+                'end_station': data['end_station'],
+                'time': time,
+                'train_number': time_data['train_number'],
+                'platform': time_data['platform'],
+            })
+        datasets.append(data)
+
+    return datasets
+
+
 def parse_stations(table):
     stations = []
     for row in table:
-        data.append(row)
-    return data
         if row and isinstance(row[0], basestring) and row[0].isupper():
             stations.append(row[0])
     return stations
 
 
+def parse_timetable(url):
 
-def parse_timetable(table):
+    table = parse_html_table(
+        requests.get(url).content
+    )
+    log.info('Parsed %s rows', len(table))
+
+    zone, start_station, end_station, period, timetable_date = parse_url(url)
+    log.info(
+        'Parsing timetable for '
+        'zone=%s start_station=%s, end_station=%s, period=%s, date=%s',
+        zone, start_station, end_station, period, timetable_date
+    )
+
     row_data = clean_table(table)
 
-    heading = row_data.pop()
-    platforms = row_data.pop()
+    # first cell is the heading
+    platforms = lookup_platform_number = row_data.pop(0)[:]
+    for index, platform in enumerate(platforms):
+        if not (platform and platform.isdigit()):
+            del platforms[index]
+    log.debug('Platforms: %s', platforms)
+    train_numbers = lookup_train_number = row_data.pop(0)[1:] 
+    log.debug('Train Numbers: %s', train_numbers)
     stations = parse_stations(table)
+    log.debug('Stations: %s', stations)
 
-    column_length = len(heading) 
+    column_length = len(train_numbers) 
+
     station_times = {}
-
     parsed_table = []
+
     for row in row_data:
         station = row.pop(0)
         if non_empty(row):
-            column_length, row = resized_row(row, column_length)
+            column_length, times = resized_row(row, column_length)
         log.debug('Processing station %s', station)
-        station_times[station] = [
-            ''
-        ]
+
+        station_times[station] = {
+            'zone': zone,
+            'start_station': start_station,
+            'end_station': end_station,
+            'period': period,
+            'direction': 'direction',
+            'times': generate_time_list(row, lookup_train_number, lookup_platform_number),
+        }
+
         parsed_table.append(row)
 
     trains = station_times.keys()
-    return platforms, trains, station_times, parsed_table 
+
+    return (zone, start_station, end_station, period, platforms, trains,
+            station_times, parsed_table)
+
+def get_default(row, index, default=None):
+    try:
+        return row[index]
+    except IndexError:
+        return default
 
 
+def generate_time_list(row, lookup_train_number, lookup_platform_number):
+    time_list = []
+    for index, time in enumerate(row):
+        if time:
+            time_list.append({
+                time: {
+                    'train_number': get_default(lookup_train_number, index-1),
+                    'platform': get_default(lookup_platform_number, index-1),
+                }
+            })
+
+
+def generate_station_record():
+    pass

@@ -59,3 +59,16 @@ class TrainTestCase(TestCase):
 
     def test_generate_dataset(self):
         pass
+    def test_generate_datasets(self):
+        station_times = {
+            'simonstown': {'times': []}
+        }
+        trains = ['0201']
+        expected_dataset = Dataset()
+        expected_dataset.headings = trains
+        expected_dataset.append(station_times)
+
+        self.assertEquals(
+            [expected_dataset],
+            train.generate_datasets(station_times, trains)
+        )
