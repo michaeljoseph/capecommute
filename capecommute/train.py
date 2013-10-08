@@ -23,6 +23,11 @@ def parse_url(url):
     )
 
 
+def scrape_capemetro_urls():
+    return [
+        # '%s/2013_04_08/South/ST_CT_Sun_April_2013.htm' % config.CAPEMETRO_URL,
+        '%s/2013_09_06/South/CT_ST_MonFri_September_2013.htm' % config.CAPEMETRO_URL
+    ]
 
 
 def extract_station(row):

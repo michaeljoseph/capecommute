@@ -11,28 +11,29 @@ log = logging.getLogger(__name__)
 
 def main():
     logging.basicConfig(level='DEBUG')
-    cape_metro = config.CAPEMETRO_URL
-    url = '%s/2013_04_08/South/ST_CT_Sun_April_2013.htm' % cape_metro
 
-    zone, start_station, end_station, period, timetable_date = parse_url(url)
-    log.info(
-        'Parsing timetable for '
-        'zone=%s start_station=%s, end_station=%s, period=%s, date=%s',
-        zone, start_station, end_station, period, timetable_date
-    )
+    for url in train.scrape_capemetro_urls():
+        zone, start_station, end_station, period, timetable_date = train.parse_url(url)
+        log.info(
+            'Parsing timetable for '
+            'zone=%s start_station=%s, end_station=%s, period=%s, date=%s',
+            zone, start_station, end_station, period, timetable_date
+        )
 
-    file_mask = '%s-%s-%s' % (zone, start_station, end_station)
+        table_name = 'capemetro_%s-%s-%s_train_schedule' % (zone, start_station, end_station)
 
-    content = requests.get(url).content
-    parsed_table = parse_html_table(content)
-    log.info('Parsed %s rows', len(parsed_table))
+        content = requests.get(url).content
+        parsed_table = html.parse_html_table(content)
+        log.info('Parsed %s rows', len(parsed_table))
 
-    dataset = generate_dataset(parsed_table)
-    log.info('Generated dataset %s', dataset.dict)
+        dataset = train.generate_dataset(parsed_table)
+        log.debug('Generated dataset %s', dataset.dict)
 
-    result = scraperwiki.sql.save(
-        dataset.headers,
-        dataset,
-        'capemetro_%s_train_schedule' % file_mask
-    )
-    log.info('scraperwiki.sql save result: %s', result)
+        import pprint
+        pprint.pprint(dataset.dict)
+        log.debug('Saving data=%s, table=%s',
+                  dataset.dict,
+                  table_name)
+
+        result = scraperwiki.sql.save([], dataset.dict)
+        log.info('scraperwiki.sql save result: %s', result)
