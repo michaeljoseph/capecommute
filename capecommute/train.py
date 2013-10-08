@@ -2,9 +2,11 @@ from datetime import datetime
 import logging
 
 from datalogy.html import (
-    clean_table, pad_list, non_empty, remove_nbsp,
+    clean_table, pad_list, non_empty, parse_html_table, remove_nbsp,
     strip_unprintables, normalise_tabular_labelling
 )
+from pyquery import PyQuery as pq
+import requests
 import tablib
 
 from capecommute import config
@@ -26,14 +28,14 @@ def parse_url(url):
 
 
 def scrape_capemetro_urls():
-    # urls = []
-    # '%s/Timetables.html' % config.CAPEMETRO_URL
-    # content = requests.get(url).content
-    # for link in
-    return [
-        # '%s/2013_04_08/South/ST_CT_Sun_April_2013.htm' % config.CAPEMETRO_URL,
-        '%s/2013_09_06/South/CT_ST_MonFri_September_2013.htm' % config.CAPEMETRO_URL
-    ]
+    content = requests.get('%s/Timetables.html' % config.CAPEMETRO_URL).content
+
+    urls = []
+    for link in pq(content)('a'):
+        href = link.attrib['href']
+        if '_timetables/' in href and 'htm' in href: 
+            urls.append('%s/%s' % (config.CAPEMETRO_URL, href))
+    return urls
 
 
 def extract_station(row):

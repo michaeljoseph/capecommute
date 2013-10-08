@@ -17,9 +17,11 @@ class TrainTestCase(TestCase):
 
     def test_scrape_capemetro_urls(self):
         self.assertEquals(
-            [#'%s/2013_04_08/South/ST_CT_Sun_April_2013.htm' % config.CAPEMETRO_URL,
-             '%s/2013_09_06/South/CT_ST_MonFri_September_2013.htm' % config.CAPEMETRO_URL],
-            train.scrape_capemetro_urls()
+            [
+                'http://www.capemetrorail.co.za/_timetables/2013_04_08/Central/CT_KYL_MonFri_April_2013.htm',
+                'http://www.capemetrorail.co.za/_timetables/2013_04_08/Central/CT_KYL_Sat_April_2013.htm',
+            ],
+            train.scrape_capemetro_urls()[:2]
         )
 
     def test_extract_station(self):
