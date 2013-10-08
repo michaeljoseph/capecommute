@@ -7,7 +7,7 @@ SCRAPERWIKI_SQL_API = '%s/%s/%s/sql?q=' % (
     SCRAPERWIKI_PUBLISH_TOKEN
 )
 
-CAPEMETRO_URL = 'http://www.capemetrorail.co.za/_timetables'
+CAPEMETRO_URL = 'http://www.capemetrorail.co.za'
 
 SITE_ROOT = '%s/%s/%s/http/' % (
     SCRAPERWIKI_URL,
