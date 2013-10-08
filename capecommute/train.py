@@ -59,9 +59,15 @@ def resized_row(row, length):
 def generate_dataset(table, headers):
     data = tablib.Dataset()
     data.headers = headers
+def parse_stations(table):
+    stations = []
     for row in table:
         data.append(row)
     return data
+        if row and isinstance(row[0], basestring) and row[0].isupper():
+            stations.append(row[0])
+    return stations
+
 
 
 def parse_timetable(table):
@@ -69,6 +75,7 @@ def parse_timetable(table):
 
     heading = row_data.pop()
     platforms = row_data.pop()
+    stations = parse_stations(table)
 
     column_length = len(heading) 
     station_times = {}
