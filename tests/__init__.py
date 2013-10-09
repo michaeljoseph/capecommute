@@ -57,8 +57,6 @@ class TrainTestCase(TestCase):
     #         train.append_to_dataset(original_data, row).dict
     #     )
 
-    def test_generate_dataset(self):
-        pass
     def test_generate_datasets(self):
         station_times = {
             'simonstown': {'times': []}
