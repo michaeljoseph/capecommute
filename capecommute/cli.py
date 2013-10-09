@@ -20,7 +20,7 @@ def main(debug=False):
                 train.parse_timetable(url)
             )
 
-            # dataset = train.generate_datasets(station_times, trains)
+            dataset = train.generate_datasets(station_times)
 
             table_name = (
                 'capemetro_%s-%s-%s_train_schedule' %

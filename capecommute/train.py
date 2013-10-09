@@ -55,24 +55,26 @@ def resized_row(row, length):
     return new_column_length, row
 
 
-def generate_datasets(station_times, headers):
+def generate_datasets(station_times):
     datasets = []
 
     for station, data in station_times.items():
         dataset = tablib.Dataset()
-        dataset.headers = headers
-        print(data)
-        for time, time_data in data['times']:
-            print(time)
-            print(time_data)
-            dataset.append({
-                'start_station': data['start_station'],
-                'end_station': data['end_station'],
-                'time': time,
-                'train_number': time_data['train_number'],
-                'platform': time_data['platform'],
-            })
-        datasets.append(data)
+        dataset.headers = [
+            'Zone', 'Station', 'Time', 'Train Number', 'Platform' 
+        ]
+
+        log.info(data)
+        for times in data['times']:
+            for time, time_data in times.items():
+                dataset.append((
+                    data['zone'],
+                    station,
+                    time,
+                    time_data['train_number'],
+                    time_data['platform']
+                ))
+        datasets.append(dataset)
 
     return datasets
 
