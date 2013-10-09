@@ -51,15 +51,9 @@ class TrainTestCase(TestCase):
                 }]
             }
         }
-        expected_dataset = Dataset()
-        expected_dataset.headings = [
-            'Zone', 'Station', 'Time', 'Train Number', 'Platform'
-        ]
-        expected_dataset.append(
-            ('South', 'Muizenberg', '11:30', '201', '1')
-        )
 
         self.assertEquals(
-            json.dumps(expected_dataset.dict),
-            json.dumps(train.generate_dataset(station_times).dict)
+            ('[{"Zone": "South", "Station": "Muizenberg", "Time": "11:30", '
+             '"Train Number": "201", "Platform": "1"}]'),
+            train.generate_dataset(station_times).json
         )
