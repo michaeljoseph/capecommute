@@ -1,9 +1,10 @@
 from datetime import datetime
+import json
 
 from tablib import Dataset
 from unittest2 import TestCase
 
-from capecommute import train, config
+from capecommute import train
 
 
 class TrainTestCase(TestCase):
@@ -18,8 +19,10 @@ class TrainTestCase(TestCase):
     def test_scrape_capemetro_urls(self):
         self.assertEquals(
             [
-                'http://www.capemetrorail.co.za/_timetables/2013_04_08/Central/CT_KYL_MonFri_April_2013.htm',
-                'http://www.capemetrorail.co.za/_timetables/2013_04_08/Central/CT_KYL_Sat_April_2013.htm',
+                ('http://www.capemetrorail.co.za/'
+                 '_timetables/2013_04_08/Central/CT_KYL_MonFri_April_2013.htm'),
+                ('http://www.capemetrorail.co.za/'
+                 '_timetables/2013_04_08/Central/CT_KYL_Sat_April_2013.htm'),
             ],
             train.scrape_capemetro_urls()[:2]
         )
@@ -35,38 +38,28 @@ class TrainTestCase(TestCase):
             train.extract_station(row)
         )
 
-    # def test_append_to_dataset(self):
-    #     original_data = Dataset()
-    #     original_data.headers = ['first', 'second', 'third']
-
-    #     row = [1, 2, 3]
-
-    #     self.assertEquals(
-    #         [dict(zip(original_data.headers, row))],
-    #         train.append_to_dataset(original_data, row).dict
-    #     )
-
-    # def test_append_to_dataset_more_columns(self):
-    #     original_data = Dataset()
-    #     original_data.headers = ['first', 'second', 'third']
-
-    #     row = [1, 2, 3, 4]
-
-    #     self.assertEquals(
-    #         [dict(zip(original_data.headers, row))],
-    #         train.append_to_dataset(original_data, row).dict
-    #     )
-
-    def test_generate_datasets(self):
+    def test_generate_dataset(self):
         station_times = {
-            'simonstown': {'times': []}
+            'Muizenberg': {
+                'zone': 'South',
+                'station': 'Muizenberg',
+                'times': [{
+                    '11:30': {
+                        'train_number': '201',
+                        'platform': '1',
+                    }
+                }]
+            }
         }
-        trains = ['0201']
         expected_dataset = Dataset()
-        expected_dataset.headings = trains
-        expected_dataset.append(station_times)
+        expected_dataset.headings = [
+            'Zone', 'Station', 'Time', 'Train Number', 'Platform'
+        ]
+        expected_dataset.append(
+            ('South', 'Muizenberg', '11:30', '201', '1')
+        )
 
         self.assertEquals(
-            [expected_dataset],
-            train.generate_datasets(station_times, trains)
+            json.dumps(expected_dataset.dict),
+            json.dumps(train.generate_dataset(station_times).dict)
         )

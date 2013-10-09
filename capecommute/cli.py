@@ -1,7 +1,6 @@
 import logging
+import json
 
-from datalogy.html import parse_html_table
-import requests
 import scraperwiki
 
 from capecommute import train
@@ -14,13 +13,13 @@ def main(debug=False):
     #
     logging.basicConfig(level='DEBUG' if debug else 'INFO')
 
-    for url in train.scrape_capemetro_urls():
+    # for url in [' http://www.capemetrorail.co.za/_timetables/2013_04_08/South/ST_CT_Sun_April_2013.htm']:#train.scrape_capemetro_urls():
+    for url in ['http://www.capemetrorail.co.za/_timetables/2013_09_06/South/CT_ST_MonFri_September_2013.htm']:
         try:
-            zone, start_station, end_station, period, platforms, trains, station_times, parsed_timetable = (
-                train.parse_timetable(url)
-            )
+            (zone, start_station, end_station, period, platforms, trains,
+             stations, station_times) = train.parse_timetable(url)
 
-            dataset = train.generate_datasets(station_times)
+            dataset = train.generate_dataset(station_times)
 
             table_name = (
                 'capemetro_%s-%s-%s_train_schedule' %
@@ -28,10 +27,19 @@ def main(debug=False):
             ).lower().replace('-', '_')
 
             log.debug('Saving table=%s', table_name)
-            from pprint import pprint
-            pprint(station_times, indent=4)
 
-            # result = scraperwiki.sql.save([], dataset.dict, table_name=table_name)
-            # log.info('scraperwiki.sql save result: %s', result)
+            result = scraperwiki.sql.save(
+                [],
+                dataset.dict,
+                table_name=table_name
+            )
+            log.info('scraperwiki.sql save result: %s', result)
+
+            with open('%s.csv' % table_name, 'w') as csv_file:
+                csv_file.write(dataset.csv)
+
+            with open('%s.json' % table_name, 'w') as json_file:
+                json_file.write(json.dumps(dataset.dict, indent=4))
+
         except:
             log.exception('%s bombed, continuing', url)
