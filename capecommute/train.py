@@ -58,7 +58,7 @@ def resized_row(row, length):
 def generate_dataset(station_times):
     dataset = tablib.Dataset()
     dataset.headers = [
-        'Zone', 'Station', 'Time', 'Train Number', 'Platform'
+        'zone', 'station', 'time', 'train_number', 'platform'
     ]
 
     for station, data in station_times.items():

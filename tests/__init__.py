@@ -53,7 +53,7 @@ class TrainTestCase(TestCase):
         }
 
         self.assertEquals(
-            ('[{"Zone": "South", "Station": "Muizenberg", "Time": "11:30", '
-             '"Train Number": "201", "Platform": "1"}]'),
+            ('[{"zone": "South", "station": "Muizenberg", "time": "11:30", '
+             '"train_number": "201", "platform": "1"}]'),
             train.generate_dataset(station_times).json
         )
